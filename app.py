@@ -8,7 +8,7 @@ app = Flask(__name__)
 
 swagger = Swagger(app)
 
-@app.route('/lunch', methods=('GET',))
+@app.route("/lunch", methods=("GET",))
 def lunch():
     """
     Reads recipes and ingredients data and returns JSON with available recipes.
@@ -38,14 +38,14 @@ def lunch():
 
     """
     #Read json data
-    ingreds = json.load(open('./data/ingredients.json'))["ingredients"]
-    recipes = json.load(open('./data/recipes.json'))["recipes"]
+    ingreds = json.load(open("./data/ingredients.json"))["ingredients"]
+    recipes = json.load(open("./data/recipes.json"))["recipes"]
 
     #Filter recipes
     d = datetime.datetime.now()
     filtered = filter_recipes(recipes,ingreds,d)
 
-    #Return recipe list
+    #Return filtered recipe list
 
     return jsonify({"recipes":filtered})
 
@@ -102,4 +102,4 @@ def filter_recipes(recipes,ingredients,test_date):
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0')

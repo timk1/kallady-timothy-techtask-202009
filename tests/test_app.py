@@ -4,8 +4,8 @@ import json
 from app import filter_recipes
 from .conftest import client
 
-ingreds = json.load(open('./data/ingredients.json'))["ingredients"]
-recipes = json.load(open('./data/recipes.json'))["recipes"]
+ingreds = json.load(open("./data/ingredients.json"))["ingredients"]
+recipes = json.load(open("./data/recipes.json"))["recipes"]
 
 def test_filter():
     """
@@ -56,7 +56,7 @@ def test_get_request(client):
     Integration test of GET /lunch
     """
     
-    res = client.get('/lunch')
+    res = client.get("/lunch")
 
     filtered = res.get_json()["recipes"]
 
