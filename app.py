@@ -41,7 +41,7 @@ def lunch():
 
     #Return recipe list
 
-    return jsonify({"Hello":"World"})
+    return jsonify({"recipes":[]})
 
 def filter_recipes(recipes,ingredients,test_date):
     """
