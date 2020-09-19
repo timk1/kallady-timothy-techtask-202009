@@ -12,19 +12,25 @@ def test_filter():
     Test whether the filter correctly removes ingredients past their useby date
     """
 
-    #With useby date in the past
-    d1 = datetime.datetime(2000,1,1,12,0)
+    #For date in the future
+    d1 = datetime.datetime(2020,1,1,12,0)
 
     assert filter_recipes(recipes,ingreds,d1) == [] #all recipes are filtered
 
-    #With useby in future
-    d2 = datetime.datetime(2030,1,1,12,0)
+    #For date in the past
+    d2 = datetime.datetime(2000,1,1,12,0)
 
     filtered = filter_recipes(recipes,ingreds,d2)
 
-    #no recipes are filtered
+    #only recipes missing an ingredient are filtered
     for r in recipes:
-        assert r in filtered
+        available_ingreds = [ingred["title"] for ingred in ingreds]
+        available = True
+        for i in r["ingredients"]:
+            if i not in available_ingreds:
+                available = False
+        if available:
+            assert r in filtered
 
     #With use-by in between
     d3 = datetime.datetime(2018,3,20,12,0)
@@ -38,7 +44,7 @@ def test_best_before():
     Test whether recipes with ingredients past their best-before date are placed last
     """
 
-    d4 = datetime.datetime(2018,3,20,12,0)
+    d4 = datetime.datetime(2018,3,26,12,0)
 
     filtered = filter_recipes(recipes,ingreds,d4)
 
@@ -70,10 +76,11 @@ def check_bb(filtered, date):
     #Classifiy each recipe as past best-before or not
     for r in filtered:
         past_bb = False
-        for ingred in r["ingredients"]:
-            best_before = datetime.datetime.strptime(ingred_d[ing], "%Y-%m-%d")
-            if date > best_before:
-                past_bb = True
+        for ing in r["ingredients"]:
+            if ing in ingred_d:
+                best_before = datetime.datetime.strptime(ingred_d[ing], "%Y-%m-%d")
+                if date > best_before:
+                    past_bb = True
         r["past_bb"] = past_bb
         
     #Compare all recipes with each other

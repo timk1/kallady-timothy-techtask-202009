@@ -1,6 +1,8 @@
 from flask import Flask, jsonify
 from flasgger import Swagger
 import json
+import copy
+import datetime
 
 app = Flask(__name__)
 
@@ -36,12 +38,16 @@ def lunch():
 
     """
     #Read json data
+    ingreds = json.load(open('./data/ingredients.json'))["ingredients"]
+    recipes = json.load(open('./data/recipes.json'))["recipes"]
 
     #Filter recipes
+    d = datetime.datetime.now()
+    filtered = filter_recipes(recipes,ingreds,d)
 
     #Return recipe list
 
-    return jsonify({"recipes":[]})
+    return jsonify({"recipes":filtered})
 
 def filter_recipes(recipes,ingredients,test_date):
     """
@@ -56,11 +62,43 @@ def filter_recipes(recipes,ingredients,test_date):
         list: List of filtered and ordered recipe dicts.
     """
 
-    #Remove ingredients past their use-by
+    #Convert recipes and ingredients to dicts
+    r_d = {r["title"]:r["ingredients"] for r in recipes}
+    i_d = {i["title"]:{"use-by":i["use-by"],"best-before":i["best-before"]} for i in ingredients}
 
-    #Determine what recipes can be made, and whether they are past best before date
+    recipe_cp = copy.deepcopy(recipes)
 
-    return []
+    #Classify recipes as past their best-before
+    for r in recipe_cp:
+        past_bb = False
+        for ing in r["ingredients"]:
+            if (ing in i_d) and test_date > datetime.datetime.strptime(i_d[ing]["best-before"],"%Y-%m-%d"):
+                past_bb = True
+        r["past_bb"] = past_bb
+
+    #Create new filtered recipe list
+    l1 = [] #For recipes not past best before
+    l2 = [] #For recipes past best before
+
+    for r in recipe_cp:
+        past_bb = False
+        available = True
+        for ing in r["ingredients"]:
+            if (ing in i_d) and (test_date <= datetime.datetime.strptime(i_d[ing]["use-by"],"%Y-%m-%d")):
+                if r["past_bb"]:
+                    past_bb = True
+            else:
+                available = False
+        if available:
+            if not past_bb:
+                l1.append(r)
+            else:
+                l2.append(r)
+
+    res = l1 + l2
+    for r in res:
+        r.pop("past_bb",None)
+    return res
 
 
 if __name__ == "__main__":
