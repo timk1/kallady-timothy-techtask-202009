@@ -37,12 +37,31 @@ def lunch():
     """
     #Read json data
 
-    #Remove ingredients past their use-by
-
-    #Determine what recipes can be made, and whether they are past best before date
+    #Filter recipes
 
     #Return recipe list
 
     return jsonify({"Hello":"World"})
 
-app.run(debug=True)
+def filter_recipes(recipes,ingredients,test_date):
+    """
+    Filter recipes by ingredient use-by and order by ingredient best-before
+
+    Args:
+        recipes (list): List of recipe dicts.
+        ingredients (list): List of ingredient dicts.
+        test_date (datetime): Datetime object of date to compare useby/best-before with.
+
+    Returns:
+        list: List of filtered and ordered recipe dicts.
+    """
+
+    #Remove ingredients past their use-by
+
+    #Determine what recipes can be made, and whether they are past best before date
+
+    return []
+
+
+if __name__ == "__main__":
+    app.run(debug=True)
